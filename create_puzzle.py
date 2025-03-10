@@ -47,6 +47,7 @@ def marking(graph: list[list], n: int, point1: tuple) -> list[list]:
 
     return graph
 
+# retuns all ways reaching from point1 to point2
 def find_way(graph: list[list], n: int, point1: tuple, point2: tuple) -> list[list]:
     cur_graph = marking(deepcopy(graph), n, point1)
     all_ways = []
@@ -74,8 +75,29 @@ def find_way(graph: list[list], n: int, point1: tuple, point2: tuple) -> list[li
 
     return all_ways
 
-def checkup_bruteforce(graph: list[list]) -> bool:
-    pass
+def find_point_positions(graph: list[list], point_mark: int):
+    point_pos = []
+    for idy, line in enumerate(graph):
+        for idx, el in enumerate(line):
+            if el == point_mark:
+                point_pos += [(idy, idx)]
+
+    return point_pos
+
+def checkup_bruteforce(graph: list[list], n, cur, points_pos: list[list[tuple]]) -> list[list]:
+    cur_graph = deepcopy(graph)
+    for i in range(cur, n+1):
+        paths = find_way(cur_graph, n, *points_pos[i-1])
+        print(f"_________________ paths amount for {i} mark = {len(paths)}")
+        if len(paths) == 0:
+            return None
+        for way in paths:
+            markup_graph(cur_graph, way) # TODO
+            checkup_bruteforce(cur_graph, n, cur+1, points_pos)
+
+    return cur_graph
+
+
 
 if __name__ == "__main__":
     graph = [[2, 0, 1, 6, 5, 0],
@@ -85,22 +107,17 @@ if __name__ == "__main__":
              [0, 0, 0, 3, 0, 5],
              [3, 0, 0, 0, 0, 4]]
 
-    all_ways = find_way(graph, 6, (2, 3), (5, 5))
-    print(len(all_ways))
-    for way in all_ways:
-        print(way, len(way))
+    point_pos = []
+    for i in range(1, 7):
+        point_pos += [find_point_positions(graph, i)]
+
+    checkup_bruteforce(graph, 6, 1, point_pos)
 
 """
 test true
-3 0 0 3 0
-4 0 0 0 0
-2 1 0 1 0
-0 0 0 0 0
-2 0 0 4 0
-
-2 2 0 0 0
-3 0 4 4 1
-0 3 0 0 0
-0 0 0 1 0
-0 0 0 0 0
+1 0 0 4 5
+0 4 0 2 0
+0 0 1 0 0
+0 3 0 2 0
+3 0 5 0 0
 """
