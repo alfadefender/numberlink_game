@@ -1,50 +1,51 @@
-class Method:
-    pass
-
-class ConsoleMethod(Method):
-    pass
-
-class FileMethod(Method):
-    pass
-
-
 class Puzzle:
-    def __init__(self, method: Method):
-        self._size = 0
-        self._graph = []
-        self._method = method
+    def __init__(self, size, count_points, graph):
+        self._size = size
+        self._graph = graph
+        self._count_points = count_points
 
+        # список всех решений головоломки
+        self._results = []
+        # список словарей путей для каждой пары чисел
+        self._paths = []
+        # статус головоломки (решена / не решена)
+        self._status = False
+
+    # флаг пуста ли головоломка
     def is_empty(self):
-        return self._size == 0 or self._graph == []
+        return self._size == 0 or self._graph == [] or self._count_points == 0
 
-    def console_input(self):
-        self._size = int(input())
-        for i in range(self._size):
-            self._graph += [list(map(int, input().split()))]
+    # флаг решена ли головоломка
+    def is_solved(self):
+        return self._status
 
-    def file_input(self):
-        pass
+    # генераторная функция, возвращающая пару - готовое решение и пути в этом решении
+    def get_result(self) -> tuple[list[list], list]:
+        for idx, result in enumerate(self._results):
+            yield result, self._paths[idx]
 
-    def input_puzzle(self):
-        match self._method:
-            case ConsoleMethod():
-                self.console_input()
-            case FileMethod():
-                self.file_input()
+        return None
 
-    def console_output(self):
-        if self.is_empty():
-            print("Empty Puzzle")
-            return
-        for line in self._graph:
-            print(*line)
+    # возвращает граф
+    def get_graph(self):
+        return self._graph
 
-    def file_output(self):
-        pass
+    # возвращает размер головоломки
+    def get_size(self):
+        return self._size
 
-    def output_puzzle(self):
-        match self._method:
-            case ConsoleMethod():
-                self.console_output()
-            case FileMethod():
-                self.file_output()
+    # возвращает количество различных пар чисел в головоломке
+    def get_count_points(self):
+        return self._count_points
+
+    # поставить флаг готовности
+    def set_is_solved(self):
+        self._status = True
+
+    # установить поле self._paths
+    def set_paths(self, paths: list[dict]):
+        self._paths = paths
+
+    # установить поле self._results
+    def set_result(self, results: list[list]):
+        self._results = results
