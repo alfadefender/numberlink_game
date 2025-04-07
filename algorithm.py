@@ -1,6 +1,7 @@
 from queue import Queue
 from copy import deepcopy
 from time import time
+from puzzle import Puzzle
 
 
 DEBUG = False
@@ -18,7 +19,7 @@ class Logger:
         if DEBUG:
             if to_file:
                 for line in graph:
-                    print(*line, file=file)
+                    print(*line, file=self.file)
             else:
                 for line in graph:
                     print(*line)
@@ -183,7 +184,7 @@ def _queue_points(points_pos: list[list[tuple]]):
 # чисел и полный перебор с оптимизацией: предварительная проверка пути на
 # помеху другим парам чисел
 # переменная puzzle обязана быть типа "Puzzle"
-def the_least_distance_method(puzzle, count_results: int = 1):
+def the_least_distance_method(puzzle: Puzzle, count_results: int = 1):
     if puzzle.is_empty():
         return []
 
@@ -194,6 +195,8 @@ def the_least_distance_method(puzzle, count_results: int = 1):
 
     points_pos = []
     results = []
+    current_path = {}
+    all_paths = []
 
     for i in range(1, count_points + 1):
         points_pos += [_find_point_positions(graph, i)]
@@ -204,7 +207,7 @@ def the_least_distance_method(puzzle, count_results: int = 1):
                             n: int,
                             points_queue: list[int]):
 
-        nonlocal results
+        nonlocal results, current_path, all_paths
 
         if len(results) >= count_results:
             logger.algorithm_print_skip()
@@ -212,6 +215,7 @@ def the_least_distance_method(puzzle, count_results: int = 1):
 
         if len(points_queue) == 0:
             results += [deepcopy(graph)]
+            all_paths += [deepcopy(current_path)]
             logger.algorithm_print_succeed()
             return None
 
@@ -231,7 +235,8 @@ def the_least_distance_method(puzzle, count_results: int = 1):
                 break
 
             logger.algorithm_print_new_way(points_queue[0], way)
-            puzzle.set_new_path(points_queue[0], way)
+
+            current_path[points_queue[0]] = way
 
             temp_mark = points_queue.pop(0)
             _the_least_distance(_markup_graph(cur_graph, way, temp_mark),
@@ -248,7 +253,9 @@ def the_least_distance_method(puzzle, count_results: int = 1):
         logger.graph_pretty_print(g)
     logger.log_print(f"{round(time() * 1000) - t1} ms")
 
-    return results
+    puzzle.set_is_solved()
+    puzzle.set_result(results)
+    puzzle.set_paths(all_paths)
 
 
 if __name__ == "__main__":
