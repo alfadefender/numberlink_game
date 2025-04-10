@@ -14,7 +14,6 @@
     1. PIL (pillow) - невстроенный модуль
 """
 
-
 from constants import *
 from logger import measure_time_console
 from puzzle import Puzzle
@@ -27,6 +26,14 @@ class Solver:
         self._puzzle = None
 
     def input_puzzle(self, method: int, filename: str = "input.txt"):
+        """
+        Ввод данных головоломки
+
+        :param method: параметр ввода, указанный в константах
+        :param filename: путь до файла
+        :return: присваивает значение полю <self._puzzle>
+        """
+
         size = 0
         count_points = 0
         graph = []
@@ -47,6 +54,14 @@ class Solver:
         self._puzzle = Puzzle(size, count_points, graph)
 
     def output_solution(self, method: int, filename: str = "output.txt"):
+        """
+        Вывод решений головоломки
+
+        :param method: параметр вывода, указанный в константах
+        :param filename: путь до файла
+        :return: ничего не возвращает
+        """
+
         if self._puzzle.is_solved():
             if method == GRAPH_TO_CONSOLE:
                 for result_matrix, path in self._puzzle.get_result():
@@ -76,7 +91,8 @@ class Solver:
                             number = graph[y][x]
 
                             draw.rectangle(
-                                [x * 100, y * 100, x * 100 + 100, y * 100 + 100],
+                                [x * 100, y * 100, x * 100 + 100,
+                                 y * 100 + 100],
                                 fill=COLORS[number])
                             if number:
                                 if number // 10 > 0:
@@ -91,10 +107,9 @@ class Solver:
                     for number, path in paths.items():
                         for y, x in path[1:-1]:
                             draw.rectangle(
-                                [x * 100, y * 100, x * 100 + 100, y * 100 + 100],
+                                [x * 100, y * 100, x * 100 + 100,
+                                 y * 100 + 100],
                                 fill=COLORS[number])
-
-                    image.show()
 
                     image.save(f"images/solution_{idx_image}.png")
 
@@ -102,4 +117,10 @@ class Solver:
 
     @measure_time_console
     def solve_puzzle(self, count_results: int = 1):
+        """
+        Запуск метода решения головоломки
+
+        :param count_results: количество решений, которые необходимо получить
+        :return: ничего не возвращает
+        """
         the_least_distance_method(self._puzzle, count_results)

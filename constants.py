@@ -10,14 +10,14 @@ GRAPH_TO_FILE = 2
 GRAPH_TO_IMG = 3
 
 INPUT_METHODS = {
-    "console_in" : GRAPH_FROM_CONSOLE,
-    "file_in" : GRAPH_FROM_FILE
+    "console_in": GRAPH_FROM_CONSOLE,
+    "file_in": GRAPH_FROM_FILE
 }
 
 OUTPUT_METHODS = {
-    "console_out" : GRAPH_TO_CONSOLE,
-    "file_out" : GRAPH_TO_FILE,
-    "img_out" : GRAPH_TO_IMG
+    "console_out": GRAPH_TO_CONSOLE,
+    "file_out": GRAPH_TO_FILE,
+    "img_out": GRAPH_TO_IMG
 }
 
 HELP_DESCRIPTION = """
@@ -60,38 +60,38 @@ HELP_DEBUG = """
 Флаг для включения отладки
 """
 
-EXCEPTION_INPUT_METHOD = "Произошло исключение: некорректный метод ввода\nВозможные методы:\n\t1. console_in\n\t2. file_in"
-EXCEPTION_OUTPUT_METHOD = "Произошло исключение: некорректный метод вывода\nВозможные методы:\n\t1. console_out\n\t2. file_out\n\t3. img_out"
-EXCEPTION_COUNT_SOLUTIONS = "Произошло исключение: некорректное число решений\nЧисло решений обязано быть числом большим нуля"
+EXCEPTION_INPUT_METHOD = """Произошло исключение: некорректный метод ввода
+Возможные методы:
+\t1. console_in
+\t2. file_in
+"""
+EXCEPTION_OUTPUT_METHOD = """Произошло исключение: некорректный метод вывода
+Возможные методы:
+\t1. console_out
+\t2. file_out
+\t3. img_out
+"""
+EXCEPTION_COUNT_SOLUTIONS = """Произошло исключение: некорректное число решений
+Число решений обязано быть числом большим нуля
+"""
 
 COLORS = {
-    0 : (255, 255, 255),
-    1 : (255, 0, 0),
-    2 : (0, 255, 0),
-    3 : (0, 0, 255),
-    4 : (255, 255, 0),
-    5 : (128, 0, 128),
-    6 : (255, 165, 0),
-    7 : (139, 69, 19),
-    8 : (255, 215, 0),
-    9 : (75, 0, 130),
-    10 : (135, 206, 250),
-    11 : (255, 105, 180),
-    12 : (230, 230, 250),
-    13 : (194, 178, 128),
-    14 : (124, 252, 0),
-    15 : (22, 170, 200)
+    0: (255, 255, 255),
+    1: (255, 0, 0),
+    2: (0, 255, 0),
+    3: (0, 0, 255),
+    4: (255, 255, 0),
+    5: (128, 0, 128),
+    6: (255, 165, 0),
+    7: (139, 69, 19),
+    8: (255, 215, 0),
+    9: (75, 0, 130),
+    10: (135, 206, 250),
+    11: (255, 105, 180),
+    12: (230, 230, 250),
+    13: (194, 178, 128),
+    14: (124, 252, 0),
+    15: (22, 170, 200)
 }
 
 LOG_FILENAME = "assets/logs.txt"
-
-class DEBUG:
-    flag = False
-
-    @staticmethod
-    def get_flag():
-        return DEBUG.flag
-
-    @staticmethod
-    def switch_debug():
-        DEBUG.flag = not DEBUG.flag

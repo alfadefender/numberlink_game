@@ -1,13 +1,17 @@
+"""
+Главный модуль запускающий программу
+
+В классе <Solution> реализуется CLI.
+"""
+
 from solver import Solver
 from constants import *
+from dbm import DEBUG
 import argparse
 from logger import check_success_for_method
 from os.path import exists
 
-
 # TODO | от 10/04
-# TODO | сделать разные реализации ввода данных такие как:
-# TODO | .json (???), с помощью GUI (???)
 # TODO | написать нормальное описание в --help
 # TODO | тесты
 
@@ -22,19 +26,37 @@ class Solution:
     global _log_file
 
     def __init__(self):
-        parser = argparse.ArgumentParser(description=HELP_DESCRIPTION, formatter_class=argparse.RawTextHelpFormatter)
+        parser = argparse.ArgumentParser(
+            description=HELP_DESCRIPTION,
+            formatter_class=argparse.RawTextHelpFormatter
+        )
 
-        parser.add_argument("method_in", help=HELP_METHOD_IN)
+        parser.add_argument("method_in",
+                            help=HELP_METHOD_IN)
 
-        parser.add_argument("method_out", help=HELP_METHOD_OUT)
+        parser.add_argument("method_out",
+                            help=HELP_METHOD_OUT)
 
-        parser.add_argument("--input_file", "-if", help=HELP_INPUT_FILE, default="input.txt")
+        parser.add_argument("--input_file",
+                            "-if",
+                            help=HELP_INPUT_FILE,
+                            default="input.txt")
 
-        parser.add_argument("--output_file", "-of", help=HELP_OUTPUT_FILE, default="output.txt")
+        parser.add_argument("--output_file",
+                            "-of",
+                            help=HELP_OUTPUT_FILE,
+                            default="output.txt")
 
-        parser.add_argument("--count", "-c", help=HELP_COUNT, default=1, type=int)
+        parser.add_argument("--count",
+                            "-c",
+                            help=HELP_COUNT,
+                            default=1,
+                            type=int)
 
-        parser.add_argument("--debug", "-db", action="store_true", help=HELP_DEBUG)
+        parser.add_argument("--debug",
+                            "-db",
+                            action="store_true",
+                            help=HELP_DEBUG)
 
         args = parser.parse_args()
 
