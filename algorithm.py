@@ -18,16 +18,18 @@
 Он используется только тут.
 """
 
-
 from queue import Queue
 from copy import deepcopy
 import time
 from puzzle import Puzzle
-from constants import DEBUG
+from dbm import DEBUG
 
 
-# debug only
 class Logger:
+    """
+    Используется только в этом файле для отладки шагов алгоритма
+    """
+
     def __init__(self, filename=None):
         self.filename = filename
         self.file = None
@@ -80,9 +82,16 @@ class Logger:
             print("\n" * count, file=self.file)
 
 
-# поиск возможных направлений для текущей точки относительно матрицы
-# роза направлений - вверх, вправо, вниз, влево
 def _find_directions(n: int, cur_pos: tuple) -> list[tuple]:
+    """
+    поиск возможных направлений для текущей точки относительно матрицы
+    роза направлений - вверх, вправо, вниз, влево
+
+    :param n: размер поля
+    :param cur_pos: текущая точка
+    :return: возвращает список направлений
+    """
+
     directions = [(-1, 0), (0, 1), (1, 0), (0, -1)]
 
     if cur_pos[0] == 0:  # строка idx=0 => вверх нельзя
@@ -97,10 +106,20 @@ def _find_directions(n: int, cur_pos: tuple) -> list[tuple]:
     return directions
 
 
-# оптимизационная проверка поиска возможных путей, использующаяся, чтобы
-# отбросить заведомо "плохие" построенные пути
 def _check_points(point1: tuple, point2: tuple, n: int,
-                  graph: list[list], logger) -> bool:
+                  graph: list[list], logger: Logger) -> bool:
+    """
+    оптимизационная проверка поиска возможных путей, использующаяся, чтобы
+    отбросить заведомо "плохие" построенные пути
+
+    :param point1: начальная точка
+    :param point2: конечная точка
+    :param n: размер поля
+    :param graph: матрица поля
+    :param logger: логгер для отладки
+    :return: возвращает true если путь между двумя точками есть, иначе - false
+    """
+
     logger.log_print(f"CHECK POINTS ENTER: {point1}, {point2}")
 
     que = Queue()
@@ -116,7 +135,8 @@ def _check_points(point1: tuple, point2: tuple, n: int,
                 next_point = (
                     direction[0] + cur_point[0], direction[1] + cur_point[1])
                 if next_point == point2:
-                    logger.log_print(f"CHECK POINTS EXIT WITH TRUE: {point1}, {point2}")
+                    logger.log_print(
+                        f"CHECK POINTS EXIT WITH TRUE: {point1}, {point2}")
                     return True
 
                 if graph[next_point[0]][next_point[1]] == 0 and used.count(
@@ -128,8 +148,17 @@ def _check_points(point1: tuple, point2: tuple, n: int,
     return False
 
 
-# основная функция поиска путей, является генератором
 def _find_way(graph: list[list], n: int, point1: tuple, point2: tuple) -> list:
+    """
+    основная функция поиска путей, является генератором
+
+    :param graph: матрица поля
+    :param n: размер поля
+    :param point1: начальная точка
+    :param point2: конечная точка
+    :return: генерирует следующий путь между двумя точками
+    """
+
     que = Queue()
     que.put([point1])
 
@@ -150,8 +179,15 @@ def _find_way(graph: list[list], n: int, point1: tuple, point2: tuple) -> list:
                     que.put(deepcopy(cur_way + [next_point]))
 
 
-# для конкретного числа находит в матрице, где они находятся
-def _find_point_positions(graph: list[list], point_mark: int):
+def _find_point_positions(graph: list[list], point_mark: int) -> list[tuple]:
+    """
+    для конкретного числа находит в матрице, где они находятся
+
+    :param graph: матрица поля
+    :param point_mark: метка пары чисел
+    :return: возвращает список позиций пары чисел для данной метки
+    """
+
     point_pos = []
     for idy, line in enumerate(graph):
         for idx, el in enumerate(line):
@@ -161,34 +197,57 @@ def _find_point_positions(graph: list[list], point_mark: int):
     return point_pos
 
 
-# наносит полученный путь на копию матрицы и возвращает её
-def _markup_graph(cur_graph: list[list], way: list[int], cur: int) -> list[list]:
+def _markup_graph(cur_graph: list[list], way: list[int], cur: int) -> \
+        list[list]:
+    """
+    наносит полученный путь на копию матрицы и возвращает её
+
+    :param cur_graph: матрица поля
+    :param way: путь
+    :param cur: метка пары чисел
+    :return: возвращает копию матрицы поля с наложенным на нее путем
+    """
+
     deep_graph = deepcopy(cur_graph)
     for point in way:
         deep_graph[point[0]][point[1]] = cur
     return deep_graph
 
 
-# возвращает очередь из пар точек чисел в соответствии с первоначальным
-# алгоритмом поиска пар чисел по наименьшему расстоянию между ними
-def _queue_points(points_pos: list[list[tuple]]):
+def _queue_points(points_pos: list[list[tuple]]) -> list[list[tuple]]:
+    """
+    возвращает очередь из пар точек чисел в соответствии с первоначальным
+    алгоритмом поиска пар чисел по наименьшему расстоянию между ними
+
+    :param points_pos: список списков пар точек
+    :return: возвращает упорядоченный список
+    """
+
     points = [(idx + 1, ((first[0] - second[0]) ** 2 + (
-                first[1] - second[1]) ** 2) ** 0.5) for idx, (first, second) in
+            first[1] - second[1]) ** 2) ** 0.5) for idx, (first, second) in
               enumerate(points_pos)]
     points = sorted(points, key=lambda x: x[1])
     return [idx for idx, distance in points]
 
 
-# основной метод поиска возможных решений
-# используется необоснованная оптимизация с меньшим расстоянием между парами
-# чисел и полный перебор с оптимизацией: предварительная проверка пути на
-# помеху другим парам чисел
-# переменная puzzle обязана быть типа "Puzzle"
-def the_least_distance_method(puzzle: Puzzle, count_results: int = 1):
+def the_least_distance_method(puzzle: Puzzle, count_results: int = 1) -> None:
+    """
+    основной метод поиска возможных решений
+    используется необоснованная оптимизация с меньшим расстоянием между парами
+    чисел и полный перебор с оптимизацией: предварительная проверка пути на
+    помеху другим парам чисел
+    переменная puzzle обязана быть типа "Puzzle"
+
+    :param puzzle: внутреннее представление головоломки <Puzzle>
+    :param count_results: количество решений
+    :return: результаты складываются во внутреннее представление
+    """
+
     if puzzle.is_empty():
         return []
 
-    with Logger(f"assets/algorithm_logs_{time.strftime("%Y_%m_%d--%H_%M_%S", time.localtime())}.txt") as logger:
+    with Logger(f"assets/algorithm_logs_\
+{time.strftime("%Y_%m_%d--%H_%M_%S", time.localtime())}.txt") as logger:
         graph = puzzle.get_graph()
         n = puzzle.get_size()
         count_points = puzzle.get_count_points()
@@ -222,7 +281,8 @@ def the_least_distance_method(puzzle: Puzzle, count_results: int = 1):
             cur_graph = deepcopy(graph)
 
             for point in points_queue:
-                if not _check_points(*points_pos[point - 1], n, cur_graph, logger):
+                if not _check_points(*points_pos[point - 1], n, cur_graph,
+                                     logger):
                     logger.algorithm_print_back()
                     return
 
