@@ -1,9 +1,68 @@
+"""
+Файл со всеми использующимися константами
+"""
+
 GRAPH_FROM_CONSOLE = 1
 GRAPH_FROM_FILE = 2
 
 GRAPH_TO_CONSOLE = 1
 GRAPH_TO_FILE = 2
 GRAPH_TO_IMG = 3
+
+INPUT_METHODS = {
+    "console_in" : GRAPH_FROM_CONSOLE,
+    "file_in" : GRAPH_FROM_FILE
+}
+
+OUTPUT_METHODS = {
+    "console_out" : GRAPH_TO_CONSOLE,
+    "file_out" : GRAPH_TO_FILE,
+    "img_out" : GRAPH_TO_IMG
+}
+
+HELP_DESCRIPTION = """
+Numberlink-solver - программа решающая головоломку Numberlink.
+
+TODO дописать сюда алгоритм и описание ввода головоломки.
+не забыть про то, что картинки сохраняются в images
+возможно стоит переделать в ансверс просто потому что туда скидывать ответы
+и сказать про то, что дебаг можно отследить в папке ассетс
+"""
+
+HELP_METHOD_IN = """
+Метод подачи входных данных
+    [console_in] -> для ввода с консоли
+    [file_in] -> для ввода с файла
+"""
+
+HELP_METHOD_OUT = """
+Метод выдачи решения
+    [console_out] -> для вывода в консоль
+    [file_out] -> для вывода в файл
+    [img_out] -> для вывода в картинку
+"""
+
+HELP_INPUT_FILE = """
+Абсолютный или относительный путь входного файла (если есть)
+"""
+
+HELP_OUTPUT_FILE = """
+Абсолютный или относительный путь выходного файла (если есть)
+Для вывода ответа в картинку это поле не будет восприниматься
+Каждое решение будет сохраняться в папке images
+"""
+
+HELP_COUNT = """
+Количество решений (число большее нуля)
+"""
+
+HELP_DEBUG = """
+Флаг для включения отладки
+"""
+
+EXCEPTION_INPUT_METHOD = "Произошло исключение: некорректный метод ввода\nВозможные методы:\n\t1. console_in\n\t2. file_in"
+EXCEPTION_OUTPUT_METHOD = "Произошло исключение: некорректный метод вывода\nВозможные методы:\n\t1. console_out\n\t2. file_out\n\t3. img_out"
+EXCEPTION_COUNT_SOLUTIONS = "Произошло исключение: некорректное число решений\nЧисло решений обязано быть числом большим нуля"
 
 COLORS = {
     0 : (255, 255, 255),
@@ -23,3 +82,16 @@ COLORS = {
     14 : (124, 252, 0),
     15 : (22, 170, 200)
 }
+
+LOG_FILENAME = "assets/logs.txt"
+
+class DEBUG:
+    flag = False
+
+    @staticmethod
+    def get_flag():
+        return DEBUG.flag
+
+    @staticmethod
+    def switch_debug():
+        DEBUG.flag = not DEBUG.flag

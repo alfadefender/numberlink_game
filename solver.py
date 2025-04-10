@@ -1,4 +1,22 @@
+"""
+Модуль <Solver> считывает головоломку, обрабатывает ее и выводит решение.
+
+Реализована поддержка ввода:
+    1). с консоли
+    2). с файла
+
+Реализован поддержка вывода:
+    1). в консоль
+    2). в файл
+    3). в виде изображения
+
+Используются дополнительные модули:
+    1. PIL (pillow) - невстроенный модуль
+"""
+
+
 from constants import *
+from logger import measure_time_console
 from puzzle import Puzzle
 from algorithm import the_least_distance_method
 from PIL import Image, ImageDraw, ImageFont
@@ -14,25 +32,17 @@ class Solver:
         graph = []
 
         if method == GRAPH_FROM_CONSOLE:
-            try:
-                size = int(input())
-                count_points = int(input())
-                for i in range(size):
-                    graph += [list(map(int, input().split()))]
-
-            except Exception as e:
-                print(e)
+            size = int(input())
+            count_points = int(input())
+            for i in range(size):
+                graph += [list(map(int, input().split()))]
 
         elif method == GRAPH_FROM_FILE:
-            try:
-                with open(filename) as file:
-                    size = int(file.readline())
-                    count_points = int(file.readline())
-                    for line in file:
-                        graph += [list(map(int, line.split()))]
-
-            except Exception as e:
-                print(e)
+            with open(filename) as file:
+                size = int(file.readline())
+                count_points = int(file.readline())
+                for line in file:
+                    graph += [list(map(int, line.split()))]
 
         self._puzzle = Puzzle(size, count_points, graph)
 
@@ -45,14 +55,11 @@ class Solver:
                     print("_________________")
 
             elif method == GRAPH_TO_FILE:
-                try:
-                    with open(filename, "w") as file:
-                        for result_matrix, path in self._puzzle.get_result():
-                            for line in result_matrix:
-                                print(*line, file=file)
-                            print("_________________", file=file)
-                except Exception as e:
-                    print(e)
+                with open(filename, "w") as file:
+                    for result_matrix, path in self._puzzle.get_result():
+                        for line in result_matrix:
+                            print(*line, file=file)
+                        print("_________________", file=file)
 
             elif method == GRAPH_TO_IMG:
                 idx_image = 0
@@ -89,9 +96,10 @@ class Solver:
 
                     image.show()
 
-                    image.save(f"solution_{idx_image}.png")
+                    image.save(f"images/solution_{idx_image}.png")
 
                     idx_image += 1
 
+    @measure_time_console
     def solve_puzzle(self, count_results: int = 1):
         the_least_distance_method(self._puzzle, count_results)

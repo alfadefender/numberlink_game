@@ -1,3 +1,8 @@
+"""
+Модуль <Puzzle> реализует внутреннее представление головоломки,
+а также методы корректного взаимодействия с ней.
+"""
+
 class Puzzle:
     def __init__(self, size, count_points, graph):
         self._size = size
