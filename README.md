@@ -39,3 +39,8 @@ M
 <h3>Как пользоваться программой и какие есть аргументы можно посмотреть командой:</h3>
 
 <code>python main.py --help</code> или <code>python main.py -h</code>
+
+<h3><b>Сторонние библиотеки (указанные в <i>requirements.txt</i>):</b></h3>
+1) <i>PIL (pillow)</i>
+<br><br>
+Для установки сторонних библиотек используйте эту команду: <code>pip install -r requirements.txt</code>
