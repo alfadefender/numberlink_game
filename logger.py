@@ -46,7 +46,8 @@ def _format_time(time: float) -> str:
 def check_success_for_method(file: open):
     """
     Декоратор для отлова ошибок и замера времени выполнения программы.
-    Применяется только для функции solve класса Solution, дабы обобщить результат
+    Применяется только для функции solve класса Solution,
+    дабы обобщить результат
 
     :param file: передается объект типа <open>
     :return: обернутая функция
@@ -64,7 +65,8 @@ def check_success_for_method(file: open):
 
                 # в лог-файл
                 print(
-                    f"[{time.ctime(time.time())}] - INFO - Puzzle is solved successfully",
+                    f"[{time.ctime(time.time())}]\
+                     - INFO - Puzzle is solved successfully",
                     file=file)
                 print(f"\tTime spent : {time_spent}", file=file)
 
@@ -72,7 +74,8 @@ def check_success_for_method(file: open):
 
                 # в лог-файл
                 print(
-                    f"[{time.ctime(time.time())}] - ERROR - !!! Caught exception !!!",
+                    f"[{time.ctime(time.time())}]\
+                     - ERROR - !!! Caught exception !!!",
                     file=file)
                 print(f"\tType of exception : {e.__class__.__name__}",
                       file=file)

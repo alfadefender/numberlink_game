@@ -39,7 +39,8 @@ class TestTheLeastDistanceMethod(unittest.TestCase):
 
     @patch('time.time', return_value=1625065000)  # Закрепляем время
     @patch('builtins.open', new_callable=MagicMock)  # Для Logger'a
-    def test_the_least_distance_method_multiple_results(self, mock_open, mock_time):
+    def test_the_least_distance_method_multiple_results(self, mock_open,
+                                                        mock_time):
         mock_puzzle = MagicMock(spec=Puzzle)
         mock_puzzle.is_empty.return_value = False
         mock_puzzle.get_graph.return_value = [[0, 1], [1, 0]]

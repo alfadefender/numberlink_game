@@ -23,6 +23,7 @@ from copy import deepcopy
 import time
 from puzzle import Puzzle
 from dbm import DEBUG
+import json
 
 
 class Logger:
@@ -33,6 +34,8 @@ class Logger:
     def __init__(self, filename=None):
         self.filename = filename
         self.file = None
+        self.temp_paths = {}
+        self.tempfile = "assets/temp_logs.json"
 
     def __enter__(self):
         if self.filename and DEBUG.get_flag():
@@ -80,6 +83,21 @@ class Logger:
     def print_spaces(self, count: int):
         if DEBUG.get_flag():
             print("\n" * count, file=self.file)
+
+    def save_path_local(self, mark : int, path : list):
+        self.temp_paths[mark] = path
+
+    @staticmethod
+    def checkpoint(self):
+        with open(self.temp_paths, "w") as file:
+            json.dump(self.temp_paths, file)
+
+    @staticmethod
+    def get_checkpoint(self) -> dict:
+        with open(self.temp_paths) as file:
+            self.temp_paths = json.load(file)
+
+        return self.temp_paths
 
 
 def _find_directions(n: int, cur_pos: tuple) -> list[tuple]:
@@ -246,8 +264,10 @@ def the_least_distance_method(puzzle: Puzzle, count_results: int = 1) -> None:
     if puzzle.is_empty():
         return []
 
-    with Logger(f"assets/algorithm_logs_\
-{time.strftime("%Y_%m_%d--%H_%M_%S", time.localtime())}.txt") as logger:
+    cur_time = time.localtime()
+    format_time = time.strftime("%Y_%m_%d--%H_%M_%S", cur_time)
+
+    with Logger(f"assets/algorithm_logs_{format_time}.txt") as logger:
         graph = puzzle.get_graph()
         n = puzzle.get_size()
         count_points = puzzle.get_count_points()
@@ -295,6 +315,7 @@ def the_least_distance_method(puzzle: Puzzle, count_results: int = 1) -> None:
                     break
 
                 logger.algorithm_print_new_way(points_queue[0], way)
+                logger.temp_paths[points_queue[0]] = way
 
                 current_path[points_queue[0]] = way
 

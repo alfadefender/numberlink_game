@@ -26,9 +26,10 @@ class Puzzle:
 
     def get_result(self) -> tuple[list[list], list]:
         """
-        Генераторная функция, возвращающая пару - готовое решение и пути в этом решении
+        Генераторная функция, возвращающая пару - готовое решение
+        и пути в этом решении
 
-        :return: возвращает такую конструкцию типов: tuple[list[list], list]
+        :return: возвращает конструкцию типов: tuple[list[list], list]
         """
         for idx, result in enumerate(self._results):
             yield result, self._paths[idx]

@@ -25,13 +25,64 @@ class Solver:
     def __init__(self):
         self._puzzle = None
 
+    # методы для создания головоломки
+    def setup_puzzle(self, puzzle: Puzzle):
+        self._puzzle = puzzle
+
+    def output_puzzle(self, method: int, filename: str = "output.txt"):
+        """
+        Вывод головоломки
+
+        :param method:      параметр вывода, указанный в константах
+        :param filename:    путь до файла
+        """
+
+        if method == GRAPH_TO_CONSOLE:
+            for line in self._puzzle.get_graph():
+                print(*line)
+            print("_________________")
+
+        elif method == GRAPH_TO_FILE:
+            with open(filename, "w") as file:
+                for line in self._puzzle.get_graph():
+                    print(*line, file=file)
+
+        elif method == GRAPH_TO_IMG:
+            size = self._puzzle.get_size()
+            graph = self._puzzle.get_graph()
+            image = Image.new("RGB", (size * 100, size * 100),
+                              "white")
+            draw = ImageDraw.Draw(image)
+            font = ImageFont.load_default(40)
+
+            for y in range(size):
+                for x in range(size):
+                    number = graph[y][x]
+
+                    draw.rectangle(
+                        [x * 100, y * 100, x * 100 + 100,
+                         y * 100 + 100],
+                        fill=COLORS[number])
+                    if number:
+                        if number // 10 > 0:
+                            draw.text((x * 100 + 25, y * 100 + 25),
+                                      str(graph[y][x]), font=font,
+                                      fill=(0, 0, 0))
+                        else:
+                            draw.text((x * 100 + 37, y * 100 + 25),
+                                      str(graph[y][x]), font=font,
+                                      fill=(0, 0, 0))
+
+            image.save(f"images/new_graph.png")
+
+    # методы для обычного считывания и решения
     def input_puzzle(self, method: int, filename: str = "input.txt"):
         """
         Ввод данных головоломки
 
-        :param method: параметр ввода, указанный в константах
-        :param filename: путь до файла
-        :return: присваивает значение полю <self._puzzle>
+        :param method:      параметр ввода, указанный в константах
+        :param filename:    путь до файла
+        :return:            присваивает значение полю <self._puzzle>
         """
 
         size = 0
@@ -59,7 +110,6 @@ class Solver:
 
         :param method: параметр вывода, указанный в константах
         :param filename: путь до файла
-        :return: ничего не возвращает
         """
 
         if self._puzzle.is_solved():
@@ -121,6 +171,5 @@ class Solver:
         Запуск метода решения головоломки
 
         :param count_results: количество решений, которые необходимо получить
-        :return: ничего не возвращает
         """
         the_least_distance_method(self._puzzle, count_results)
