@@ -84,7 +84,7 @@ class Logger:
         if DEBUG.get_flag():
             print("\n" * count, file=self.file)
 
-    def save_path_local(self, mark : int, path : list):
+    def save_path_local(self, mark: int, path: list):
         self.temp_paths[mark] = path
 
     @staticmethod

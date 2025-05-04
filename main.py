@@ -34,6 +34,11 @@ class Solution:
             formatter_class=argparse.RawTextHelpFormatter
         )
 
+        parser.add_argument("--restart",
+                            "-r",
+                            action="store_true",
+                            help=HELP_RESTART)
+
         parser.add_argument("--method_in",
                             "-mi",
                             default=GRAPH_FROM_CONSOLE,
@@ -75,57 +80,77 @@ class Solution:
 
         args = parser.parse_args()
 
+        self.restarting = True
         self.solving = True
         self.creating = True
+        self.count = None
+        self.method_out = None
+        self.output_file = None
 
-        method_out = args.method_out
-        self.method_out = OUTPUT_METHODS.get(method_out)
-        if self.method_out is None:
-            print(EXCEPTION_OUTPUT_METHOD)
-            self.solving = False
-            self.creating = True
+        if not args.restart:
+            self.restarting = False
 
-        self.input_file = args.input_file
+            method_out = args.method_out
+            self.method_out = OUTPUT_METHODS.get(method_out)
+            if self.method_out is None:
+                print(EXCEPTION_OUTPUT_METHOD)
+                self.solving = False
+                self.creating = True
 
-        self.output_file = args.output_file
+            self.input_file = args.input_file
 
-        if args.debug:
-            DEBUG.switch_debug()
+            self.output_file = args.output_file
 
-        create_puzzle = args.create_puzzle
-        self.cp_size = 0
-        if create_puzzle:
-            if create_puzzle.isdigit():
-                self.cp_size = int(create_puzzle)
+            if args.debug:
+                DEBUG.switch_debug()
+
+            create_puzzle = args.create_puzzle
+            self.cp_size = 0
+            if create_puzzle:
+                if create_puzzle.isdigit():
+                    self.cp_size = int(create_puzzle)
+                else:
+                    print(EXCEPTION_GENERATOR_SIZE)
+                    self.creating = False
+
+                self.solving = False
+
             else:
-                print(EXCEPTION_GENERATOR_SIZE)
-                self.creating = False
+                method_in = args.method_in
+                self.method_in = INPUT_METHODS.get(method_in)
+                if self.method_in is None:
+                    print(EXCEPTION_INPUT_METHOD)
+                    self.solving = False
 
-            self.solving = False
+                self.count = args.count
+                if self.count == 0:
+                    print(EXCEPTION_COUNT_SOLUTIONS)
+                    self.solving = False
 
-        else:
-            method_in = args.method_in
-            self.method_in = INPUT_METHODS.get(method_in)
-            if self.method_in is None:
-                print(EXCEPTION_INPUT_METHOD)
-                self.solving = False
-
-            self.count = args.count
-            if self.count == 0:
-                print(EXCEPTION_COUNT_SOLUTIONS)
-                self.solving = False
-
-        self._solver = Solver()
+        settings = {
+            "restart_flag": self.restarting,
+            "method_out": self.method_out
+        }
+        self._solver = Solver(settings)
 
     @check_success_for_method(_log_file)
     def solve(self):
         if self.solving:
-            self._solver.input_puzzle(self.method_in, self.input_file)
-            self._solver.solve_puzzle(self.count)
-            self._solver.output_solution(self.method_out, self.output_file)
+            if not self._solver.checkup_previous():
+                self._solver.input_puzzle(self.method_in, self.input_file)
+
+            if self.count is None:
+                self._solver.solve_puzzle()
+            else:
+                self._solver.solve_puzzle(self.count)
+
+            if self.output_file is None:
+                self._solver.output_solution()
+            else:
+                self._solver.output_solution(self.output_file)
+
             return
 
-        # TODO
         if self.creating:
             self._solver.setup_puzzle(generate_puzzle(self.cp_size))
             self._solver.output_puzzle(self.method_out, self.output_file)
@@ -133,3 +158,4 @@ class Solution:
 
 if __name__ == "__main__":
     Solution().solve()
+    # python main.py -mi file_in -mo img_out -if C:\Users\Serejo\PycharmProjects\numberlink_game\examples\graph11.txt

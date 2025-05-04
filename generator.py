@@ -77,6 +77,7 @@ def _get_empty_cell(n: int, graph: list[list[int]]) -> tuple:
     return choice(cells)
 
 
+# TODO эта хуйня падает с IndexError, ее надо понять и пофиксить
 def generate_puzzle(n: int) -> Puzzle:
     """
     Генерирует головоломку квадратных размеров NxN
