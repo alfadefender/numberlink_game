@@ -51,10 +51,11 @@ class TestSolver(unittest.TestCase):
         solver.setup_puzzle(Puzzle(2, 2, [[1, 2], [1, 2]]))
         solver.solve_puzzle()
         solver.output_solution()
-        s = (
-            "Потрачено времени на решение : 0 ms\n",
+        s = "".join((
             "   1|   2|\n",
             "   1|   2|\n",
             "_________________\n"
-        )
-        self.assertEqual("".join(s), mock_stdout.getvalue())
+        ))
+        temp = mock_stdout.getvalue()
+        idx = temp.find("\n")
+        self.assertEqual(s, temp[idx+1:])
