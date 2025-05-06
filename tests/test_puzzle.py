@@ -2,7 +2,7 @@ import unittest
 from puzzle import Puzzle
 
 
-class TestGenerator(unittest.TestCase):
+class TestPuzzle(unittest.TestCase):
     def test_is_empty(self):
         puzzle = Puzzle(0, 0, [])
         self.assertTrue(puzzle.is_empty())

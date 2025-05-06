@@ -4,7 +4,8 @@ from unittest.mock import patch, mock_open
 
 from puzzle import Puzzle
 from solver import Solver
-from constants import GRAPH_FROM_CONSOLE, GRAPH_TO_CONSOLE
+from constants import GRAPH_FROM_CONSOLE, GRAPH_TO_CONSOLE, GRAPH_TO_FILE, \
+    GRAPH_TO_IMG
 
 
 class TestSolver(unittest.TestCase):
@@ -15,9 +16,24 @@ class TestSolver(unittest.TestCase):
         yield "1 2"
         yield "1 2"
 
+    def test_setup_puzzle_checkup(self):
+        solver = Solver({
+            "restart_flag": False,
+            "method_out": GRAPH_TO_CONSOLE
+        })
+        solver.setup_puzzle(Puzzle(2, 2, [[1, 2], [1, 2]]))
+        self.assertIsNotNone(solver._puzzle)
+
     def test_checkup_previous_false(self):
         solver = Solver({
             "restart_flag": False,
+            "method_out": GRAPH_TO_CONSOLE
+        })
+        self.assertFalse(solver.checkup_previous())
+
+    def test_checkup_previous_another_false(self):
+        solver = Solver({
+            "restart_flag": True,
             "method_out": GRAPH_TO_CONSOLE
         })
         self.assertFalse(solver.checkup_previous())
@@ -58,4 +74,46 @@ class TestSolver(unittest.TestCase):
         ))
         temp = mock_stdout.getvalue()
         idx = temp.find("\n")
-        self.assertEqual(s, temp[idx+1:])
+        self.assertEqual(s, temp[idx + 1:])
+
+    @patch("builtins.open", new_callable=mock_open)
+    def test_output_solution_file(self, mock_open):
+        solver = Solver({
+            "restart_flag": False,
+            "method_out": GRAPH_TO_FILE
+        })
+        solver.setup_puzzle(Puzzle(2, 2, [[1, 2], [1, 2]]))
+        solver.solve_puzzle()
+        solver.output_solution()
+        self.assertEqual(1, mock_open.call_count)
+
+    @patch("builtins.open", new_callable=mock_open)
+    def test_output_solution_img(self, mock_open):
+        solver = Solver({
+            "restart_flag": False,
+            "method_out": GRAPH_TO_IMG
+        })
+        solver.setup_puzzle(Puzzle(2, 2, [[1, 2], [1, 2]]))
+        solver.solve_puzzle()
+        solver.output_solution()
+        self.assertEqual(1, mock_open.call_count)
+
+    @patch("builtins.open", new_callable=mock_open)
+    def test_output_puzzle_file(self, mock_open):
+        solver = Solver({
+            "restart_flag": False,
+            "method_out": GRAPH_TO_FILE
+        })
+        solver.setup_puzzle(Puzzle(2, 2, [[1, 2], [1, 2]]))
+        solver.output_puzzle(GRAPH_TO_FILE)
+        self.assertEqual(1, mock_open.call_count)
+
+    @patch("builtins.open", new_callable=mock_open)
+    def test_output_puzzle_img(self, mock_open):
+        solver = Solver({
+            "restart_flag": False,
+            "method_out": GRAPH_TO_IMG
+        })
+        solver.setup_puzzle(Puzzle(2, 2, [[1, 2], [1, 2]]))
+        solver.output_puzzle(GRAPH_TO_IMG)
+        self.assertEqual(1, mock_open.call_count)
