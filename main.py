@@ -13,10 +13,8 @@ from logger import check_success_for_method
 from os.path import exists
 from generator import generate_puzzle
 
-# TODO | от 10/04
+# TODO | от 04/05
 # TODO | написать нормальное описание в --help
-# TODO | возобновление работы при некорректном завершении программы
-# TODO | тесты
 
 _log_file = None
 if exists(LOG_FILENAME):
@@ -158,4 +156,3 @@ class Solution:
 
 if __name__ == "__main__":
     Solution().solve()
-    # python main.py -mi file_in -mo img_out -if C:\Users\Serejo\PycharmProjects\numberlink_game\examples\graph11.txt

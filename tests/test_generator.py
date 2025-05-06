@@ -36,7 +36,6 @@ class TestGenerator(unittest.TestCase):
         self.assertListEqual([(0, 1), (1, 0), (2, 1), (1, 2)], result)
 
     def test_generate_puzzle(self):
-        # TODO INDEX ERROR FUCKED UP
         n = 5
         puzzle = generate_puzzle(n)
         the_least_distance_method(puzzle)

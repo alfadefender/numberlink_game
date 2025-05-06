@@ -58,7 +58,6 @@ def _find_new_way(n: int, graph: list[list[int]], start_point: tuple) -> dict:
 
     return {
         "start": start_point,
-        "end": path[-1],
         "path": path,
         "len": len_path
     }
@@ -77,7 +76,6 @@ def _get_empty_cell(n: int, graph: list[list[int]]) -> tuple:
     return choice(cells)
 
 
-# TODO эта хуйня падает с IndexError, ее надо понять и пофиксить
 def generate_puzzle(n: int) -> Puzzle:
     """
     Генерирует головоломку квадратных размеров NxN
@@ -90,14 +88,18 @@ def generate_puzzle(n: int) -> Puzzle:
     len_points = randint(n - 1, n + 1)
     marks = dict()
     cur_mark = 1
+    i = 0
 
-    for _ in range(len_points):
+    while i < len_points:
         start_point = _get_empty_cell(n, graph)
 
         returned_value = _find_new_way(n, graph, start_point)
 
-        marks[cur_mark] = returned_value
-        cur_mark += 1
+        if len(returned_value.get("path")) >= 2:
+            returned_value["end"] = returned_value["path"][-1]
+            marks[cur_mark] = returned_value
+            cur_mark += 1
+            i += 1
 
     returned_graph = [[0 for _ in range(n)] for _ in range(n)]
 

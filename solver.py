@@ -139,6 +139,7 @@ class Solver:
                         for elem in line:
                             temp = f"{(4 - len(str(elem))) * ' '}{elem}"
                             print(temp, end="|")
+                        print()
 
                     print("_________________")
 
