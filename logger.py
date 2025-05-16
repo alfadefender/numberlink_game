@@ -4,6 +4,8 @@
 
 import time
 import traceback
+from os.path import exists
+from constants import LOG_FILENAME
 
 
 def _format_time(time: float) -> str:
@@ -43,56 +45,58 @@ def _format_time(time: float) -> str:
     return f"..., " + result
 
 
-def check_success_for_method(file: open):
+def check_success_for_method(func):
     """
     Декоратор для отлова ошибок и замера времени выполнения программы.
     Применяется только для функции solve класса Solution,
     дабы обобщить результат
 
-    :param file: передается объект типа <open>
     :return: обернутая функция
     """
 
-    def decorator(func):
-        def wrapper(*args, **kwargs):
-            result = None
+    file = None
+    if exists(LOG_FILENAME):
+        file = open(LOG_FILENAME, "a")
+    else:
+        file = open(LOG_FILENAME, "w")
 
-            try:
-                start_time = time.monotonic()
-                result = func(*args, **kwargs)
-                end_time = time.monotonic()
-                time_spent = _format_time(end_time - start_time)
+    def wrapper(*args, **kwargs):
+        result = None
 
-                # в лог-файл
-                print(
-                    f"[{time.ctime(time.time())}]\
-                     - INFO - Puzzle is solved successfully",
-                    file=file)
-                print(f"\tTime spent : {time_spent}", file=file)
+        try:
+            start_time = time.monotonic()
+            result = func(*args, **kwargs)
+            end_time = time.monotonic()
+            time_spent = _format_time(end_time - start_time)
 
-            except Exception as e:
+            # в лог-файл
+            print(
+                f"[{time.ctime(time.time())}]\
+                 - INFO - Puzzle is solved successfully",
+                file=file)
+            print(f"\tTime spent : {time_spent}", file=file)
 
-                # в лог-файл
-                print(
-                    f"[{time.ctime(time.time())}]\
-                     - ERROR - !!! Caught exception !!!",
-                    file=file)
-                print(f"\tType of exception : {e.__class__.__name__}",
-                      file=file)
-                print(f"\tText of exception : {str(e)}", file=file)
-                traceback.print_exc(file=file)
+        except Exception as e:
 
-                # вывод для пользователя
-                print(f"!!! Была обработана некорректная ситуация !!!")
-                print(f"\tТип ошибки : {e.__class__.__name__}")
-                print(f"\tТекст ошибки : {str(e)}")
-                print(f"Проверьте файл <logs.txt> для большей информации.")
+            # в лог-файл
+            print(
+                f"[{time.ctime(time.time())}]\
+                 - ERROR - !!! Caught exception !!!",
+                file=file)
+            print(f"\tType of exception : {e.__class__.__name__}",
+                  file=file)
+            print(f"\tText of exception : {str(e)}", file=file)
+            traceback.print_exc(file=file)
 
-            return result
+            # вывод для пользователя
+            print(f"!!! Была обработана некорректная ситуация !!!")
+            print(f"\tТип ошибки : {e.__class__.__name__}")
+            print(f"\tТекст ошибки : {str(e)}")
+            print(f"Проверьте файл <logs.txt> для большей информации.")
 
-        return wrapper
+        return result
 
-    return decorator
+    return wrapper
 
 
 def measure_time_console(func):
