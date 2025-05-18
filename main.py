@@ -3,6 +3,7 @@
 
 В классе <Solution> реализуется CLI.
 """
+import argparse
 import sys
 from random import choice
 
@@ -10,12 +11,11 @@ from funny import *
 from solver import Solver
 from constants import *
 from dbm import DEBUG
-import argparse
 from logger import check_success_for_method
 from generator import generate_puzzle
 
+
 # TODO | от 04/05
-# TODO | написать нормальное описание в --help
 
 
 class Solution:
@@ -24,10 +24,13 @@ class Solution:
 
         self.funcs = [cmd_bimba, removing_all_files, hihihaha]
 
-        parser = argparse.ArgumentParser(
-            description=HELP_DESCRIPTION,
-            formatter_class=argparse.RawTextHelpFormatter
-        )
+        parser = argparse.ArgumentParser(add_help=False)
+
+        parser.add_argument("--help",
+                            "-h",
+                            "-?",
+                            action="store_true",
+                            help=HELP_HELP)
 
         parser.add_argument("--author",
                             "-a",
@@ -41,12 +44,10 @@ class Solution:
 
         parser.add_argument("--method_in",
                             "-mi",
-                            default=GRAPH_FROM_CONSOLE,
                             help=HELP_METHOD_IN)
 
         parser.add_argument("--method_out",
                             "-mo",
-                            default=GRAPH_TO_CONSOLE,
                             help=HELP_METHOD_OUT)
 
         parser.add_argument("--input_file",
@@ -71,6 +72,7 @@ class Solution:
         parser.add_argument("--create_puzzle",
                             "-cp",
                             metavar="SIZE",
+                            type=int,
                             help=HELP_CREATE_PUZZLE)
 
         parser.add_argument("--debug",
@@ -78,75 +80,140 @@ class Solution:
                             action="store_true",
                             help=HELP_DEBUG)
 
-        if self.debug_flag:
-            try:
-                args = parser.parse_args()
-            except BaseException:
-                choice(self.funcs)()
-
-        else:
+        try:
             args = parser.parse_args()
 
-        self.restarting = True
-        self.solving = True
-        self.creating = True
-        self.count = None
-        self.method_out = None
-        self.output_file = None
-
-        if args.author:
-            open_teachers_page()
+        except SystemExit:
+            print("\n\nInvalid argument\n\n")
+            # choice(self.funcs)()
             sys.exit(0)
 
-        if not args.restart:
-            self.restarting = False
+        self.function = None
 
-            method_out = args.method_out
-            self.method_out = OUTPUT_METHODS.get(method_out)
-            if self.method_out is None:
-                print(EXCEPTION_OUTPUT_METHOD)
-                self.solving = False
-                self.creating = True
+        if args.help:
+            self.custom_help()
 
-            self.input_file = args.input_file
+        if args.author:
+            self.function = self.author_true
+            return
 
-            self.output_file = args.output_file
+        if args.restart:
+            self.function = self.restart_program
+            return
 
-            if args.debug:
-                DEBUG.switch_debug()
+        if args.create_puzzle:
+            if args.create_puzzle <= 0:
+                print(EXCEPTION_GENERATOR_SIZE)
+                sys.exit(0)
 
-            create_puzzle = args.create_puzzle
-            self.cp_size = 0
-            if create_puzzle:
-                if create_puzzle.isdigit():
-                    self.cp_size = int(create_puzzle)
-                else:
-                    print(EXCEPTION_GENERATOR_SIZE)
-                    self.creating = False
+            self.function = self.create_puzzle(
+                args.create_puzzle,
+                args.method_out,
+                args.output_file
+            )
+            return
 
-                self.solving = False
+        self.catch_method_in(args.method_in)
 
-            else:
-                method_in = args.method_in
-                self.method_in = INPUT_METHODS.get(method_in)
-                if self.method_in is None:
-                    print(EXCEPTION_INPUT_METHOD)
-                    self.solving = False
+        self.catch_method_out(args.method_out)
 
-                self.count = args.count
-                if self.count == 0:
-                    print(EXCEPTION_COUNT_SOLUTIONS)
-                    self.solving = False
+        self.input_file = args.input_file
+
+        self.output_file = args.output_file
+
+        self.catch_count(args.count)
+
+        if args.debug:
+            DEBUG.switch_debug()
 
         settings = {
-            "restart_flag": self.restarting,
+            "restart_flag": False,
             "method_out": self.method_out
         }
         self._solver = Solver(settings)
 
-    @check_success_for_method
+        self.function = self.solve
+
+    def custom_help(self):
+        print(HELP_USAGE)
+        print(HELP_DESCRIPTION)
+        print("Параметры: ")
+        print("-h, --help", end="")
+        print(HELP_HELP)
+
+        print()
+
+        print("Параметры для головоломки: ")
+        print("-mi METHOD_IN, --method_in METHOD_IN", end="")
+        print(HELP_METHOD_IN)
+        print("-mo METHOD_OUT, --method_out METHOD_OUT", end="")
+        print(HELP_METHOD_OUT)
+        print("-if FILEPATH, --input_file FILEPATH", end="")
+        print(HELP_INPUT_FILE)
+        print("-of FILEPATH, --output_file FILEPATH", end="")
+        print(HELP_OUTPUT_FILE)
+        print("-c COUNT_SOLUTIONS, --count COUNT_SOLUTIONS", end="")
+        print(HELP_COUNT)
+
+        print()
+
+        print("Остальные параметры: ")
+        print("-a, --author", end="")
+        print(HELP_AUTHOR)
+        print("-r, --restart", end="")
+        print(HELP_RESTART)
+        print("-cp SIZE, --create_puzzle SIZE", end="")
+        print(HELP_CREATE_PUZZLE)
+        print("-db, --debug", end="")
+        print(HELP_DEBUG)
+        sys.exit(0)
+
+    def catch_method_in(self, method_in):
+        self.method_in = INPUT_METHODS.get(method_in)
+        if self.method_in is None:
+            print(EXCEPTION_INPUT_METHOD)
+            sys.exit(0)
+
+    def catch_method_out(self, method_out):
+        self.method_out = OUTPUT_METHODS.get(method_out)
+        if self.method_out is None:
+            print(EXCEPTION_OUTPUT_METHOD)
+            sys.exit(0)
+
+    def catch_count(self, count):
+        self.count = count
+        if self.count <= 0:
+            print(EXCEPTION_COUNT_SOLUTIONS)
+            sys.exit(0)
+
+    def author_true(self):
+        open_teachers_page()
+        sys.exit(0)
+
+    def restart_program(self):
+        self.restarting = True
+        self._solver = Solver({"restart_flag": self.restarting})
+        self.count = None
+        self.output_file = None
+        self.solve()
+        sys.exit(0)
+
+    def create_puzzle(self, cp_size: int, method_out: str, output_file: str):
+        def wrapper():
+            self._solver = Solver({"restart_flag": False})
+            self._solver.setup_puzzle(generate_puzzle(cp_size))
+            mo = OUTPUT_METHODS.get(method_out)
+            if mo is None:
+                mo = GRAPH_TO_CONSOLE
+
+            self._solver.output_puzzle(mo, output_file)
+            sys.exit(0)
+
+        return wrapper
+
     def solve(self):
-        if self.solving:
+        @check_success_for_method
+        def _solve():
             if not self._solver.checkup_previous():
                 self._solver.input_puzzle(self.method_in, self.input_file)
 
@@ -160,13 +227,11 @@ class Solution:
             else:
                 self._solver.output_solution(self.output_file)
 
-            return
+        _solve()
 
-        if self.creating:
-            self._solver.setup_puzzle(generate_puzzle(self.cp_size))
-            self._solver.output_puzzle(self.method_out, self.output_file)
-            return
+    def run(self):
+        self.function()
 
 
 if __name__ == "__main__":
-    Solution().solve()
+    Solution().run()

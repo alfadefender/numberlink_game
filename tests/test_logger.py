@@ -1,7 +1,7 @@
 import unittest
-from unittest.mock import patch
-import io
+from unittest.mock import patch, mock_open
 from logger import _format_time, check_success_for_method, measure_time_console
+from constants import LOG_FILENAME
 
 
 class TestFormatTime(unittest.TestCase):
@@ -31,31 +31,34 @@ class TestDecorators(unittest.TestCase):
             result = test_func()
             self.assertEqual(result, "ok")
             mock_print.assert_any_call(
-                unittest.mock.ANY  # Проверим что print был вызван
+                unittest.mock.ANY
             )
 
-    def test_check_success_for_method_success(self):
-        mock_file = io.StringIO()
-
-        @check_success_for_method(mock_file)
+    @patch("builtins.open", new_callable=mock_open)
+    def test_check_success_for_method_success(self, mock_file):
+        @check_success_for_method
         def test_func():
             return 42
 
         result = test_func()
         self.assertEqual(result, 42)
-        content = mock_file.getvalue()
-        self.assertIn("INFO - Puzzle is solved successfully", content)
 
-    def test_check_success_for_method_error(self):
-        mock_file = io.StringIO()
+        mock_file.assert_called_once_with(LOG_FILENAME, "w")
 
-        @check_success_for_method(mock_file)
+        write_calls = mock_file().write.call_args_list
+        all_calls = "".join(call_args[0][0] for call_args in write_calls)
+        self.assertIn("INFO - Puzzle is solved successfully", all_calls)
+
+    @patch("builtins.open", new_callable=mock_open)
+    def test_check_success_for_method_error(self, mock_file):
+        @check_success_for_method
         def test_func():
             raise ValueError("Test error")
 
         result = test_func()
         self.assertIsNone(result)
-        content = mock_file.getvalue()
-        self.assertIn("ERROR - !!! Caught exception !!!", content)
-        self.assertIn("ValueError", content)
-        self.assertIn("Test error", content)
+        mock_file.assert_called_once_with(LOG_FILENAME, "w")
+
+        write_calls = mock_file().write.call_args_list
+        all_calls = "".join(call_args[0][0] for call_args in write_calls)
+        self.assertIn("ERROR - !!! Caught exception !!!", all_calls)

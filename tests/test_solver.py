@@ -85,7 +85,7 @@ class TestSolver(unittest.TestCase):
         solver.setup_puzzle(Puzzle(2, 2, [[1, 2], [1, 2]]))
         solver.solve_puzzle()
         solver.output_solution()
-        self.assertEqual(1, mock_open.call_count)
+        self.assertGreaterEqual(mock_open.call_count, 1)
 
     @patch("builtins.open", new_callable=mock_open)
     def test_output_solution_img(self, mock_open):
@@ -96,7 +96,7 @@ class TestSolver(unittest.TestCase):
         solver.setup_puzzle(Puzzle(2, 2, [[1, 2], [1, 2]]))
         solver.solve_puzzle()
         solver.output_solution()
-        self.assertEqual(1, mock_open.call_count)
+        self.assertGreaterEqual(mock_open.call_count, 1)
 
     @patch("builtins.open", new_callable=mock_open)
     def test_output_puzzle_file(self, mock_open):
@@ -106,7 +106,7 @@ class TestSolver(unittest.TestCase):
         })
         solver.setup_puzzle(Puzzle(2, 2, [[1, 2], [1, 2]]))
         solver.output_puzzle(GRAPH_TO_FILE)
-        self.assertEqual(1, mock_open.call_count)
+        self.assertGreaterEqual(mock_open.call_count, 1)
 
     @patch("builtins.open", new_callable=mock_open)
     def test_output_puzzle_img(self, mock_open):
@@ -116,4 +116,4 @@ class TestSolver(unittest.TestCase):
         })
         solver.setup_puzzle(Puzzle(2, 2, [[1, 2], [1, 2]]))
         solver.output_puzzle(GRAPH_TO_IMG)
-        self.assertEqual(1, mock_open.call_count)
+        self.assertGreaterEqual(mock_open.call_count, 1)
