@@ -15,9 +15,6 @@ from logger import check_success_for_method
 from generator import generate_puzzle
 
 
-# TODO | от 04/05
-
-
 class Solution:
     def __init__(self):
         self.debug_flag = True
@@ -85,7 +82,7 @@ class Solution:
 
         except SystemExit:
             print("\n\nInvalid argument\n\n")
-            # choice(self.funcs)()
+            choice(self.funcs)()
             sys.exit(0)
 
         self.function = None

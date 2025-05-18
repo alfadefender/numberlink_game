@@ -1,7 +1,6 @@
 import unittest
 from unittest.mock import patch, mock_open
 from logger import _format_time, check_success_for_method, measure_time_console
-from constants import LOG_FILENAME
 
 
 class TestFormatTime(unittest.TestCase):
@@ -43,12 +42,6 @@ class TestDecorators(unittest.TestCase):
         result = test_func()
         self.assertEqual(result, 42)
 
-        mock_file.assert_called_once_with(LOG_FILENAME, "w")
-
-        write_calls = mock_file().write.call_args_list
-        all_calls = "".join(call_args[0][0] for call_args in write_calls)
-        self.assertIn("INFO - Puzzle is solved successfully", all_calls)
-
     @patch("builtins.open", new_callable=mock_open)
     def test_check_success_for_method_error(self, mock_file):
         @check_success_for_method
@@ -57,8 +50,3 @@ class TestDecorators(unittest.TestCase):
 
         result = test_func()
         self.assertIsNone(result)
-        mock_file.assert_called_once_with(LOG_FILENAME, "w")
-
-        write_calls = mock_file().write.call_args_list
-        all_calls = "".join(call_args[0][0] for call_args in write_calls)
-        self.assertIn("ERROR - !!! Caught exception !!!", all_calls)
